@@ -1,13 +1,10 @@
 import { useState, useEffect } from "react";
-
-//axios
 import { getData, create, remove } from "../function/product";
-//react-router-dom
 import { Link } from "react-router-dom";
 
 const FormProduct = () => {
   const [data, setData] = useState([]);
-  const [form, setForm] = useState([]);
+  const [form, setForm] = useState({ name: "", detail: "", price: "" });
 
   useEffect(() => {
     loadData();
@@ -15,130 +12,126 @@ const FormProduct = () => {
 
   const loadData = () => {
     getData()
-      .then((res) => {
-        setData(res.data);
-      })
+      .then((res) => setData(res.data))
       .catch((err) => console.log(err));
   };
 
   const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-
     create(form)
-      .then((res) => {
+      .then(() => {
+        setForm({ name: "", detail: "", price: "" }); // reset form
         loadData();
       })
       .catch((err) => console.log(err));
   };
 
-  const handleRemove = async (id) => {
+  const handleRemove = (id) => {
     remove(id)
-      .then((res) => {
-        loadData();
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+      .then(() => loadData())
+      .catch((err) => console.log(err));
   };
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center gap-6">
+    <div className="min-h-screen bg-gray-100 p-6 flex flex-col items-center gap-10">
+      {/* Form Section */}
       <form
         onSubmit={handleSubmit}
-        className="flex w-90 flex-col gap-6 rounded-2xl bg-white shadow-2xl"
+        className="w-full max-w-md bg-white shadow-lg rounded-2xl p-6 flex flex-col gap-5"
       >
-        <h2 className="text-center font-bold">Form Product</h2>
-        <div>
-          <label htmlFor="name">Name</label>
-          <input
-            type="text"
-            placeholder="Enter Name"
-            name="name"
-            onChange={(e) => handleChange(e)}
-          />
-        </div>
+        <h2 className="text-2xl font-bold text-center text-gray-700">
+          Add Product
+        </h2>
 
-        <div>
-          <label htmlFor="detail">Detail</label>
-          <input
-            type="text"
-            placeholder="Enter Detail"
-            name="detail"
-            onChange={(e) => handleChange(e)}
-          />
-        </div>
+        <input
+          type="text"
+          placeholder="Enter Name"
+          name="name"
+          value={form.name}
+          onChange={handleChange}
+          className="w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+        />
 
-        <div>
-          <label htmlFor="price">Price</label>
-          <input
-            type="text"
-            placeholder="Enter Price"
-            name="price"
-            onChange={(e) => handleChange(e)}
-          />
-        </div>
+        <input
+          type="text"
+          placeholder="Enter Detail"
+          name="detail"
+          value={form.detail}
+          onChange={handleChange}
+          className="w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+        />
 
-        <div className="">
-          <button
-            onSubmit={handleSubmit}
-            type="submit"
-            className="h-14 w-20 rounded-xl bg-green-400 text-xl font-semibold text-white hover:bg-green-600 active:bg-green-800"
-          >
-            Submit
-          </button>
-        </div>
+        <input
+          type="text"
+          placeholder="Enter Price"
+          name="price"
+          value={form.price}
+          onChange={handleChange}
+          className="w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+        />
+
+        <button
+          type="submit"
+          className="w-full h-12 rounded-lg bg-green-500 text-white font-semibold hover:bg-green-600 active:bg-green-700 transition"
+        >
+          Submit
+        </button>
       </form>
 
-      <table className="flex h-100 w-90 flex-col gap-4 rounded-xl  bg-white">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Name</th>
-            <th>Detail</th>
-            <th>Price</th>
-            <th>Edit</th>
-            <th>Delete</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data
-            ? data.map((item, index) => (
-                <tr key={index}>
-                  <td>{index + 1}</td>
-                  <td>{item.name}</td>
-                  <td>{item.detail}</td>
-                  <td>{item.price}</td>
-                  <td>
-                    <Link to={"edit/" + item._id}>
-                      <button
-                        type="button"
-                        className="w-14 rounded-xl bg-green-400 font-semibold text-white hover:bg-green-600 active:bg-green-800"
-                      >
-                        EDIT
-                      </button>
-                    </Link>
-                  </td>
-                  <td>
-                    <button
-                      onClick={() => handleRemove(item._id)}
-                      type="button"
-                      className="w-14 rounded-xl bg-red-400 font-semibold text-white hover:bg-red-600 active:bg-red-800"
-                    >
-                      DELETE
+      {/* Table Section */}
+      <div className="w-full max-w-4xl bg-white shadow-lg rounded-2xl overflow-hidden">
+        <table className="w-full border-collapse text-left">
+          <thead className="bg-gray-200 text-gray-700">
+            <tr>
+              <th className="p-3">#</th>
+              <th className="p-3">Name</th>
+              <th className="p-3">Detail</th>
+              <th className="p-3">Price</th>
+              <th className="p-3 text-center">Edit</th>
+              <th className="p-3 text-center">Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data?.map((item, index) => (
+              <tr
+                key={index}
+                className="border-t hover:bg-gray-50 transition"
+              >
+                <td className="p-3">{index + 1}</td>
+                <td className="p-3">{item.name}</td>
+                <td className="p-3">{item.detail}</td>
+                <td className="p-3">{item.price}</td>
+                <td className="p-3 text-center">
+                  <Link to={"edit/" + item._id}>
+                    <button className="px-3 py-1 rounded-lg bg-blue-500 text-white hover:bg-blue-600">
+                      EDIT
                     </button>
-                  </td>
-                </tr>
-              ))
-            : null}
-        </tbody>
-      </table>
+                  </Link>
+                </td>
+                <td className="p-3 text-center">
+                  <button
+                    onClick={() => handleRemove(item._id)}
+                    className="px-3 py-1 rounded-lg bg-red-500 text-white hover:bg-red-600"
+                  >
+                    DELETE
+                  </button>
+                </td>
+              </tr>
+            ))}
+            {!data.length && (
+              <tr>
+                <td colSpan="6" className="p-3 text-center text-gray-500">
+                  No products available
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
