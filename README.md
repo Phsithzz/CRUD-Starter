@@ -18,6 +18,9 @@ A simple **CRUD (Create, Read, Update, Delete)** application for managing produc
 - Clean UI with TailwindCSS
 
 ---
+## 🌐 Live Demo
+Frontend only – backend not included
+🔗 View the app online: [https://crud-starter-xi.vercel.app/]
 
 ## 🧑‍💻 How to Run / วิธีใช้งานบนเครื่อง
 
